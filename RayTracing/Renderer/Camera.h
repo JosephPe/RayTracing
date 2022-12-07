@@ -1,9 +1,7 @@
 #pragma once
 
-#include "../Math/MathUtils.h" 
-#include "../Object/Scene.h"
-
-class Ray;
+#include "../Math/MathUtils.h"
+#include "../Ray.h"
 
 class Camera
 {
@@ -31,4 +29,5 @@ private:
 
 	float m_fov{ 0 }; 
 	float m_aspectRatio{ 0 }; 
+	//Ray ray;
 };

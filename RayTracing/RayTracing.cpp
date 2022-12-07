@@ -11,6 +11,8 @@ int main(int, char**)
 	renderer.CreateWindow(600, 300);
 
 	Canvas canvas(600, 300, renderer);
+	Camera camera({ 0, 2, 2 }, { 0, 0, 0 }, { 0, 1, 0 }, 70.0f, 600 / (float)300);
+
 	Scene scene;
 	//auto sphere = std::make_unique<Sphere>(glm::vec3{ 0, 0, 1 }, 0.5f, std::make_unique<Lambertian>(color3{ 0, 1, 0 }));
 	scene.AddObject(std::make_unique<Sphere>(glm::vec3{ 0, 0, -1 }, 0.5f, std::make_unique<Lambertian>(color3{ 0, 1, 0 })));
@@ -41,7 +43,7 @@ int main(int, char**)
 
 
 		canvas.Clear({ 0, 0, 0, 1 });
-		renderer.Render(canvas, scene);
+		renderer.Render(canvas, scene, camera);
 		canvas.Update();
 		//for (int i = 0; i < 500; i++)
 		//{
