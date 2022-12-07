@@ -1,5 +1,7 @@
 #include "Renderer.h"
+#include "../Object/Scene.h"
 #include <iostream>
+
 bool Renderer::Initialize()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
@@ -17,7 +19,7 @@ void Renderer::Shutdown()
 }
 bool Renderer::CreateWindow(int width, int height)
 {
-	m_window = SDL_CreateWindow("2D Renderer", 100, 100, width, height, SDL_WINDOW_SHOWN);
+	m_window = SDL_CreateWindow("Ray Tracer", 100, 100, width, height, SDL_WINDOW_SHOWN);
 	if (m_window == nullptr)
 	{
 		std::cout << "SDL Error: " << SDL_GetError() << std::endl;
@@ -32,4 +34,53 @@ bool Renderer::CreateWindow(int width, int height)
 		return false;
 	}
 	return true;
+}
+
+void Renderer::CopyCanvas(const Canvas& canvas)
+{
+	SDL_RenderCopy(m_renderer, canvas.m_texture, nullptr, nullptr);
+}
+
+void Renderer::Present()
+{
+	SDL_RenderPresent(m_renderer);
+}
+
+
+
+void Renderer::Render(Canvas& canvas, Scene& scene, Camera& camera)
+{
+	glm::vec3 lowerLeft{ -2, -1, -1 };
+	glm::vec3 eye{ 0, 0, 0 };
+	glm::vec3 right{ 4, 0, 0 };
+	glm::vec3 up{ 0, 2, 0 };
+
+	for (int y = 0; y < canvas.GetHeight(); y++)
+	{
+		for (int x = 0; x < canvas.GetWidth(); x++)
+		{
+			float u = x / (float)canvas.GetWidth();
+			float v = 1 - (y / (float)canvas.GetHeight());
+
+			glm::vec3 direction = lowerLeft + (u * right) + (v * up);
+			Ray ray{ eye, direction };
+
+			RaycastHit raycastHit;
+
+			color3 color = scene.Trace(ray, 0.01, 1000.0f, raycastHit, 5);
+
+			canvas.DrawPoint({ x, y }, color4(color, 1));
+
+			//color3 color = GetBackgroundFromRay(ray);
+			canvas.DrawPoint({ x, y }, color4(color, 1));
+		}
+	}
+}
+
+color3 Renderer::GetBackgroundFromRay(const Ray& ray)
+{
+	glm::vec3 direction = glm::normalize(ray.direction);
+	float t = 0.5f * (direction.y + 1.0f);
+
+	return lerp(color3{ 1.0f }, color3{ 0.5f, 0.7f, 1.0f }, t);
 }
